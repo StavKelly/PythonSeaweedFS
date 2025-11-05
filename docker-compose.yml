@@ -1,0 +1,37 @@
+services:
+  master:
+    image: chrislusf/seaweedfs:latest
+    command: "master -ip=master -defaultReplication=000"
+    ports:
+      - "9333:9333"
+
+  filer:
+    image: chrislusf/seaweedfs:latest
+    command: "filer -master=master:9333"
+    depends_on:
+      - master
+    ports:
+      - "8888:8888"
+  
+  volume:
+    image: chrislusf/seaweedfs:latest
+    command: "volume -max=5 -mserver=master:9333"
+    depends_on:
+      - master
+    volumes:
+      - seaweed-volume:/data
+
+  uploader:
+    build: ./app
+    volumes:
+      - ./watched:/watched
+    depends_on:
+      - master
+      - filer
+    environment:
+      - SEAWEED_MASTER_URL=http://master:9333
+      - SEAWEED_VOLUME_URL=http://filer:8888
+
+volumes:
+  seaweed-master:
+  seaweed-volume:
