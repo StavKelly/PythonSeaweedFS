@@ -1,9 +1,11 @@
 services:
   master:
     image: chrislusf/seaweedfs:latest
-    command: "master -ip=master -defaultReplication=000"
+    command: "master -ip=master -ip.bind=0.0.0.0 -defaultReplication=001"
     ports:
       - "9333:9333"
+    volumes:
+      - seaweed-master:/data
 
   filer:
     image: chrislusf/seaweedfs:latest
